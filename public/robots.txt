@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /privacy.html
+Allow: /gxmes.html
+Allow: /apps.html
+Allow: /images/
+Allow: /favicon/
+Allow: /games/
+
+# Prevent indexing of proxy-related files
+Disallow: /static/
+Disallow: /static/uv/
+Disallow: /static/auto-refresh.js
+Disallow: /static/register-sw.js
+Disallow: /static/search.js
+Disallow: /static/index.js
+Disallow: /static/sw.js
+Disallow: /static/uv-sw.js
+Disallow: /static/uv.js
+
+# Sitemaps
+Sitemap: https://1346.lol/sitemap.xml
