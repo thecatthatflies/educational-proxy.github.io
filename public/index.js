@@ -1,20 +1,3 @@
-// Register service worker
-(async () => {
-    async function unregisterSW() {
-        if (navigator.serviceWorker) {
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (let registration of registrations) {
-                await registration.unregister();
-            }
-        }
-    }
-
-    await unregisterSW();
-    navigator.serviceWorker.register('/static/uv/uv.sw.js', {
-        scope: '/'
-    });
-})();
-
 // Handle form submission
 document.getElementById('uv-form').addEventListener('submit', async event => {
     event.preventDefault();
@@ -36,6 +19,6 @@ document.getElementById('uv-form').addEventListener('submit', async event => {
         throw err;
     }
 
-    // Direct proxy navigation
-    window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+    // Navigate through frame.html
+    window.location.href = `static/frame.html?url=${encodeURIComponent(url)}`;
 });

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1346.lol - The Web</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../matrix-rain/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+    <link rel="manifest" href="../favicon/site.webmanifest">
+    <style>
+        body {
+            overflow: hidden;
+        }
+        
+        .proxy-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            background: rgba(0, 20, 0, 0.95);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #004400;
+            padding: 0 10px;
+            gap: 15px; /* Increased gap between elements */ /* Increased gap between elements */
+            position: relative; /* Added for proper positioning */ /* Added for proper positioning */
+        }
+
+        .toolbar > * {
+            position: relative; /* Ensure each element has its own stacking context */ /* Ensure each element has its own stacking context */
+            z-index: 1; /* Ensure proper stacking */ /* Ensure proper stacking */
+        }
+
+        .nav-back {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            text-decoration: none;
+            color: #00ff00;
+            border: 1px solid #004400;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            background: none;
+            position: static;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-back:hover {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: #00ff00;
+        }
+
+        .reload-button {
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: 1px solid #004400;
+            border-radius: 4px;
+            color: #00ff00;
+            font-size: 24px;
+            cursor: pointer;
+            display: inline-flex; /* Changed to inline-flex */ /* Changed to inline-flex */
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            padding: 0;
+            margin: 0;
+            flex-shrink: 0; /* Prevent shrinking */ /* Prevent shrinking */
+            position: relative; /* Ensure proper positioning */ /* Ensure proper positioning */
+            left: 0; /* Reset any inherited positioning */ /* Reset any inherited positioning */
+        }
+
+        .reload-button:hover {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: #00ff00;
+        }
+
+        .url-display {
+            flex: 1;
+            background: rgba(0, 40, 0, 0.5);
+            border: 1px solid #004400;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 8px 12px;
+            border-radius: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #proxy-frame {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 70px); /* 70px toolbar */ /* 70px toolbar */
+            border: none;
+            background: #000;
+        }
+
+        @media (max-width: 480px) {
+            .toolbar {
+                height: 60px;
+            }
+
+            .nav-back,
+            .reload-button {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            #proxy-frame {
+                height: calc(100vh - 60px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="proxy-container">
+        <div class="toolbar">
+            <button onclick="window.history.back()" class="nav-back">←</button>
+            <button class="reload-button" title="Reload page">↻</button>
+            <div class="url-display"></div>
+        </div>
+        <iframe id="proxy-frame" src="about:blank"></iframe>
+    </div>
+    <script src="../matrix-rain/matrix.js"></script>
+    <script src="uv/uv.bundle.js"></script>
+    <script src="uv/uv.config.js"></script>
+    <script src="register-sw.js"></script>
+    <script>
+        const proxyFrame = document.getElementById('proxy-frame');
+        const urlDisplay = document.querySelector('.url-display');
+        const reloadButton = document.querySelector('.reload-button');
+
+        function updateDisplay(url, title) {
+            // Display both URL and title if available
+            if (title && title !== '') {
+                urlDisplay.textContent = `${title} - ${url}`;
+            } else {
+                urlDisplay.textContent = url;
+            }
+        }
+
+        function getPageTitle() {
+            try {
+                const iframeDoc = proxyFrame.contentDocument || proxyFrame.contentWindow.document;
+                return iframeDoc.title || '';
+            } catch (err) {
+                return '';
+            }
+        }
+
+        function showError(message) {
+            urlDisplay.style.color = '#ff0000';
+            urlDisplay.textContent = `Error: ${message}`;
+        }
+
+        // Handle reload button click
+        reloadButton.addEventListener('click', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const url = params.get('url');
+            
+            if (url) {
+                try {
+                    const encodedUrl = __uv$config.prefix + __uv$config.encodeUrl(url);
+                    proxyFrame.src = encodedUrl;
+                } catch (err) {
+                    console.error('Failed to reload proxy content:', err);
+                    showError(err.toString());
+                }
+            }
+        });
+
+        // Handle iframe load events
+        proxyFrame.addEventListener('load', () => {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const url = params.get('url');
+                if (url) {
+                    // Initial update with URL
+                    updateDisplay(url, '');
+                    
+                    // Set up interval to check for title changes
+                    const titleCheckInterval = setInterval(() => {
+                        const pageTitle = getPageTitle();
+                        updateDisplay(url, pageTitle);
+                    }, 1000);
+                    
+                    // Store interval ID on the iframe element
+                    if (proxyFrame.titleCheckInterval) {
+                        clearInterval(proxyFrame.titleCheckInterval);
+                    }
+                    proxyFrame.titleCheckInterval = titleCheckInterval;
+                }
+            } catch (err) {
+                console.error('Error updating display:', err);
+            }
+        });
+
+        // Add error event listener for iframe
+        proxyFrame.addEventListener('error', (e) => {
+            showError('Failed to load content');
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('unload', () => {
+            if (proxyFrame.titleCheckInterval) {
+                clearInterval(proxyFrame.titleCheckInterval);
+            }
+        });
+
+        // Initialize the proxy frame
+        window.onload = async function() {
+            const params = new URLSearchParams(window.location.search);
+            const url = params.get('url');
+            
+            if (url) {
+                try {
+                    await registerSW();
+                    const encodedUrl = __uv$config.prefix + __uv$config.encodeUrl(url);
+                    proxyFrame.src = encodedUrl;
+                    updateDisplay(url, '');
+
+                    // Add error handler for CORS issues
+                    window.addEventListener('unhandledrejection', function(event) {
+                        if (event.reason.toString().includes('CORS')) {
+                            showError('CORS Error - Trying to reconnect...');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        }
+                    });
+
+                } catch (err) {
+                    console.error('Failed to load proxy content:', err);
+                    showError(err.toString());
+                }
+            } else {
+                showError('No URL provided');
+            }
+        };
+    </script>
+</body>
+</html>
