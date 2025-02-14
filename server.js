@@ -8,7 +8,6 @@ import { createBareServer } from '@tomphttp/bare-server-node';
 const app = express();
 const PORT = process.env.PORT || 80;
 
-// Trust proxy headers from Amazon
 app.set('trust proxy', true);
 
 const server = createBareServer('/bare/', {
@@ -106,7 +105,25 @@ httpServer.on('upgrade', (req, socket, head) => {
   }
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Bare server available at http://localhost:${PORT}/bare/`);
-});
+// Only start server if not in test
+if (process.env.NODE_ENV !== 'test') {
+  httpServer.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Bare server available at http://localhost:${PORT}/bare/`);
+  });
+}
+
+// Cleanup function for tests
+const cleanup = () => {
+  return new Promise((resolve) => {
+    // Close bare server first
+    server.close();
+    // Then close http server
+    httpServer.close(() => {
+      resolve();
+    });
+  });
+};
+
+// Export for testing
+export { app, httpServer, cleanup, PORT };

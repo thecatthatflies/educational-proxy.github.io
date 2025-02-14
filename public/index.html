@@ -3,29 +3,43 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Access the web freely and securely with 1346.lol - Your ultimate web proxy service. Enjoy unblocked games, private browsing, and lightning-fast access to your favorite content. No registration required.">
-        <meta name="keywords" content="web proxy, online games, private browsing, unblocked games, secure browsing, anonymous proxy, school proxy, free proxy service, web unblocker, private internet access">
+        <meta http-equiv="x-dns-prefetch-control" content="on">
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+        <link rel="dns-prefetch" href="https://counter.websiteout.com">
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+        
+        <!-- Performance optimizations -->
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+        <link rel="preconnect" href="https://counter.websiteout.com" crossorigin>
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+        <meta name="description" content="Access educational content and learning resources with 1346.lol - Your comprehensive education platform. Explore interactive learning tools, educational games, and academic resources. School-friendly environment with no registration required.">
+        <meta name="keywords" content="educational platform, learning resources, academic tools, educational games, student resources, school-friendly content, educational proxy, learning tools, interactive education, student access">
         <meta name="robots" content="index, follow">
         <meta name="google-adsense-account" content="ca-pub-5212136449886991">
         
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://1346.lol/">
-        <meta property="og:title" content="Fast & Secure Web Proxy Service | Unblocked Games - 1346.lol">
-        <meta property="og:description" content="Access any website securely and play unblocked games with our lightning-fast web proxy. No registration, no tracking, 100% private browsing.">
+        <meta property="og:title" content="Educational Resources & Learning Platform - 1346.lol">
+        <meta property="og:description" content="Access educational content and learning resources with our comprehensive platform. Interactive learning tools and academic resources in a school-friendly environment.">
         <meta property="og:image" content="https://1346.lol/images/og-image.png">
         <meta property="og:site_name" content="1346.lol">
 
         <!-- Twitter -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:url" content="https://1346.lol/">
-        <meta name="twitter:title" content="Fast & Secure Web Proxy | Unblocked Games - 1346.lol">
-        <meta name="twitter:description" content="Access any website securely and play unblocked games with our lightning-fast web proxy. No registration, no tracking, 100% private browsing.">
+        <meta name="twitter:title" content="Educational Platform | Learning Resources - 1346.lol">
+        <meta name="twitter:description" content="Access educational content and learning resources with our comprehensive platform. School-friendly environment with no registration required.">
         <meta name="twitter:image" content="https://1346.lol/images/og-image.png">
 
         <!-- Canonical URL -->
         <link rel="canonical" href="https://1346.lol/">
     
+        <!-- Preload critical resources -->
+        <link rel="preload" href="static/style.css" as="style">
+        <link rel="preload" href="matrix-rain/style.css" as="style">
+        <link rel="preload" href="static/uv/uv.bundle.js" as="script">
+        
         <!-- Google tag (gtag.js) - Combined Analytics and Ads -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-BHB49PT0XK"></script>
         <script>
@@ -34,14 +48,28 @@
           gtag('js', new Date());
           gtag('config', 'G-BHB49PT0XK');
           gtag('config', 'AW-11536813105');
+          gtag('event', 'conversion', {'send_to': 'AW-11536813105/jL8ACLDl8f8ZELGYl_0q'});
         </script>
 
-        <!-- Event snippet for Page view conversion page -->
+        <!-- Optimized loader visibility control -->
         <script>
-        gtag('event', 'conversion', {'send_to': 'AW-11536813105/jL8ACLDl8f8ZELGYl_0q'});
+            (function() {
+                if (localStorage.getItem('animationPlayed')) {
+                    // Add style tag immediately to hide loader
+                    document.write('<style>.loader { display: none !important; }</style>');
+                } else {
+                    // Set flag after animation completes
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const ANIMATION_DURATION = 5150; // Match the duration used in other timers
+                        setTimeout(() => {
+                            localStorage.setItem('animationPlayed', 'true');
+                        }, ANIMATION_DURATION);
+                    });
+                }
+            })();
         </script>
     
-        <title>1346.lol - Unblocked Games & Web Proxy  </title>
+        <title>1346.lol - Educational Resources & Learning Platform</title>
         <link rel="stylesheet" href="static/style.css">
         <link rel="stylesheet" href="matrix-rain/style.css">
         <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
@@ -57,8 +85,8 @@
         {
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "1346.lol UBG and Web Proxy",
-            "description": "Secure and private web proxy service providing unrestricted access to online content and unblocked games. Features fast speeds, anonymous browsing, and no registration requirements.",
+            "name": "1346.lol Educational Platform",
+            "description": "Comprehensive educational platform providing access to learning resources, interactive content, and academic tools. Features a school-friendly environment with no registration requirements.",
             "url": "https://1346.lol",
             "applicationCategory": "Education",
             "operatingSystem": "Any",
@@ -68,13 +96,13 @@
                 "priceCurrency": "USD"
             },
             "featureList": [
-                "Anonymous web proxy service",
-                "Unblocked games collection",
-                "Private browsing capability",
+                "Educational resource access",
+                "Interactive learning tools",
+                "Academic content platform",
+                "Student resources",
                 "No registration required",
-                "Fast loading speeds",
-                "School-friendly access",
-                "SSL encryption"
+                "School-friendly environment",
+                "Secure access"
             ],
             "browserRequirements": "Requires modern web browser with JavaScript enabled",
             "permissions": "No special permissions required",
@@ -85,9 +113,9 @@
 <body class="index">
     <header class="loader" role="banner">
         <div class="loader-text">
-            <span class="loader-line">Initializing system...</span>
-            <span class="loader-line">Loading components...</span>
-            <span class="loader-line">Establishing connection...</span>
+            <span class="loader-line">Loading educational platform...</span>
+            <span class="loader-line">Initializing learning resources...</span>
+            <span class="loader-line">Establishing secure connection...</span>
         </div>
         <div class="loader-scanline"></div>
     </header>
@@ -159,23 +187,26 @@
         }
     </style>
     <script>
-        window.addEventListener('load', () => {
+        // Initialize Discord widget after critical content loads
+        document.addEventListener('DOMContentLoaded', () => {
             if (!localStorage.getItem('hideDiscordWidget')) {
-                const widget = new Crate({
-                    server: '1322629666800140350',
-                    channel: '1322691116226580480',
-                    glyph: ['https://i.ibb.co/rkmwW3J/discord.png', '60px']
-                });
-                
-                const loader = document.querySelector('.loader');
-                if (loader && loader.style.display !== 'none') {
-                    widget.node.classList.add('crate');
-                    setTimeout(() => {
+                requestIdleCallback(() => {
+                    const widget = new Crate({
+                        server: '1322629666800140350',
+                        channel: '1322691116226580480',
+                        glyph: ['https://i.ibb.co/rkmwW3J/discord.png', '60px']
+                    });
+                    
+                    const loader = document.querySelector('.loader');
+                    if (loader && loader.style.display !== 'none') {
+                        widget.node.classList.add('crate');
+                        setTimeout(() => {
+                            widget.node.classList.add('visible');
+                        }, 5150);
+                    } else {
                         widget.node.classList.add('visible');
-                    }, 5150);
-                } else {
-                    widget.node.classList.add('visible');
-                }
+                    }
+                });
             }
         });
     </script>
@@ -216,15 +247,24 @@
             }
         </style>
         <script>
-            window.addEventListener('load', () => {
-                setTimeout(() => {
-                    const counter = document.querySelector('.hit-counter');
-                    counter.style.visibility = 'visible';
-                    counter.style.opacity = '0.7';
-                }, 5150);
+            // Load hit counter after main content
+            document.addEventListener('DOMContentLoaded', () => {
+                requestIdleCallback(() => {
+                    // Lazy load counter script
+                    const script = document.createElement('script');
+                    script.src = 'https://counter.websiteout.com/js/9/0/0/0';
+                    script.type = 'text/javascript';
+                    document.body.appendChild(script);
+
+                    // Show counter after animation
+                    setTimeout(() => {
+                        const counter = document.querySelector('.hit-counter');
+                        counter.style.visibility = 'visible';
+                        counter.style.opacity = '0.7';
+                    }, 5150);
+                });
             });
         </script>
-        <script type="text/javascript" src="https://counter.websiteout.com/js/9/0/0/0"></script>
     </div>
 </body>
 </html>

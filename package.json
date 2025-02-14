@@ -5,14 +5,19 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "build": "echo \"No build steps required\""
+    "build": "echo \"No build steps required\"",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles",
+    "test:ci": "NODE_OPTIONS=--experimental-vm-modules jest --ci --detectOpenHandles"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
-    "@tomphttp/bare-server-node": "^2.0.5",
-    "express": "^4.18.2"
+    "@tomphttp/bare-server-node": "^2.x",
+    "express": "^5.x"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  }
 }

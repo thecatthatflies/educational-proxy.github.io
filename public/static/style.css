@@ -1,8 +1,6 @@
 @keyframes neonFlicker {
-    0%, 100% { opacity: 1; }
-    97% { opacity: 1; }
+    0%, 97%, 99%, 100% { opacity: 1; }
     98% { opacity: 0.8; }
-    99% { opacity: 1; }
 }
 
 @keyframes typewriter {
@@ -16,9 +14,9 @@
 }
 
 @keyframes scanlineLoad {
-    0% { transform: translateY(-100%); opacity: 0; }
+    0% { transform: translate3d(0, -100%, 0); opacity: 0; }
     50% { opacity: 0.3; }
-    100% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translate3d(0, 100%, 0); opacity: 0; }
 }
 
 @keyframes neonPulse {
@@ -27,14 +25,18 @@
 }
 
 @keyframes scanline {
-    0% { transform: translateY(-100%); opacity: 0; }
+    0% { transform: translate3d(0, -100%, 0); opacity: 0; }
     50% { opacity: 0.1; }
-    100% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translate3d(0, 100%, 0); opacity: 0; }
 }
 
 @keyframes underlineSlide {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
+    from { transform: translate3d(0, 0, 0) scaleX(0); }
+    to { transform: translate3d(0, 0, 0) scaleX(1); }
+}
+
+.loader-line, .loader-scanline {
+    will-change: transform, opacity;
 }
 
 * {
@@ -97,7 +99,7 @@ body.index .loader {
 
 body.index .loader.fade-out {
     opacity: 0;
-    transition: opacity 0.5s ease 4.5s;
+    transition: opacity 0.5s ease 5.15s;
 }
 
 body:not(.index) .loader {
@@ -227,7 +229,7 @@ body.index::after {
 body.index .container {
     opacity: 0;
     animation: pageFadeIn 1s ease forwards;
-    animation-delay: 4.5s;
+    animation-delay: 5.15s;
 }
 
 @keyframes pageFadeIn {
