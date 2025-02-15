@@ -29,13 +29,13 @@
             align-items: center;
             border-bottom: 1px solid #004400;
             padding: 0 10px;
-            gap: 15px; /* Increased gap between elements */ /* Increased gap between elements */
-            position: relative; /* Added for proper positioning */ /* Added for proper positioning */
+            gap: 15px;
+            position: relative;
         }
 
         .toolbar > * {
-            position: relative; /* Ensure each element has its own stacking context */ /* Ensure each element has its own stacking context */
-            z-index: 1; /* Ensure proper stacking */ /* Ensure proper stacking */
+            position: relative;
+            z-index: 1;
         }
 
         .nav-back {
@@ -71,15 +71,15 @@
             color: #00ff00;
             font-size: 24px;
             cursor: pointer;
-            display: inline-flex; /* Changed to inline-flex */ /* Changed to inline-flex */
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
             padding: 0;
             margin: 0;
-            flex-shrink: 0; /* Prevent shrinking */ /* Prevent shrinking */
-            position: relative; /* Ensure proper positioning */ /* Ensure proper positioning */
-            left: 0; /* Reset any inherited positioning */ /* Reset any inherited positioning */
+            flex-shrink: 0;
+            position: relative;
+            left: 0;
         }
 
         .reload-button:hover {
@@ -87,23 +87,69 @@
             border-color: #00ff00;
         }
 
-        .url-display {
+        .url-bar {
             flex: 1;
             background: rgba(0, 40, 0, 0.5);
             border: 1px solid #004400;
             color: #00ff00;
             font-family: monospace;
+            font-size: 14px;
             padding: 8px 12px;
             border-radius: 4px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .url-bar::placeholder {
+            color: rgba(0, 255, 0, 0.3);
+            font-style: italic;
+        }
+
+        .url-bar:focus {
+            border-color: #00ff00;
+            background: rgba(0, 40, 0, 0.7);
+        }
+
+        .url-bar:focus::placeholder {
+            color: transparent;
+        }
+
+        .url-bar.error {
+            border-color: #ff0000;
+            color: #ff0000;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-tooltip {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .url-bar.error + .error-tooltip {
+            opacity: 1;
         }
 
         #proxy-frame {
             flex: 1;
             width: 100%;
-            height: calc(100vh - 70px); /* 70px toolbar */ /* 70px toolbar */
+            height: calc(100vh - 70px);
             border: none;
             background: #000;
         }
@@ -129,9 +175,10 @@
 <body>
     <div class="proxy-container">
         <div class="toolbar">
-            <button onclick="window.history.back()" class="nav-back">←</button>
+            <button class="nav-back" title="Go back">←</button>
             <button class="reload-button" title="Reload page">↻</button>
-            <div class="url-display"></div>
+            <input type="text" class="url-bar" placeholder="Enter URL or search term">
+            <div class="error-tooltip"></div>
         </div>
         <iframe id="proxy-frame" src="about:blank"></iframe>
     </div>
@@ -140,117 +187,222 @@
     <script src="uv/uv.config.js"></script>
     <script src="register-sw.js"></script>
     <script>
-        const proxyFrame = document.getElementById('proxy-frame');
-        const urlDisplay = document.querySelector('.url-display');
-        const reloadButton = document.querySelector('.reload-button');
-
-        function updateDisplay(url, title) {
-            // Display both URL and title if available
-            if (title && title !== '') {
-                urlDisplay.textContent = `${title} - ${url}`;
-            } else {
-                urlDisplay.textContent = url;
+        class URLManager {
+            constructor() {
+                this.proxyFrame = document.getElementById('proxy-frame');
+                this.urlBar = document.querySelector('.url-bar');
+                this.reloadButton = document.querySelector('.reload-button');
+                this.errorTooltip = document.querySelector('.error-tooltip');
+                this.lastKnownUrl = '';
+                this.navigationInProgress = false;
+                this.setupEventListeners();
             }
-        }
 
-        function getPageTitle() {
-            try {
-                const iframeDoc = proxyFrame.contentDocument || proxyFrame.contentWindow.document;
-                return iframeDoc.title || '';
-            } catch (err) {
-                return '';
-            }
-        }
+            setupEventListeners() {
+                // URL bar input handling
+                this.urlBar.addEventListener('keydown', this.handleUrlBarKeydown.bind(this));
+                this.urlBar.addEventListener('focus', () => this.urlBar.select());
 
-        function showError(message) {
-            urlDisplay.style.color = '#ff0000';
-            urlDisplay.textContent = `Error: ${message}`;
-        }
+                // Reload button
+                this.reloadButton.addEventListener('click', this.handleReload.bind(this));
 
-        // Handle reload button click
-        reloadButton.addEventListener('click', async () => {
-            const params = new URLSearchParams(window.location.search);
-            const url = params.get('url');
-            
-            if (url) {
-                try {
-                    const encodedUrl = __uv$config.prefix + __uv$config.encodeUrl(url);
-                    proxyFrame.src = encodedUrl;
-                } catch (err) {
-                    console.error('Failed to reload proxy content:', err);
-                    showError(err.toString());
-                }
-            }
-        });
+                // Frame events
+                this.proxyFrame.addEventListener('load', this.handleFrameLoad.bind(this));
+                this.proxyFrame.addEventListener('error', () => this.showError('Failed to load content'));
 
-        // Handle iframe load events
-        proxyFrame.addEventListener('load', () => {
-            try {
-                const params = new URLSearchParams(window.location.search);
-                const url = params.get('url');
-                if (url) {
-                    // Initial update with URL
-                    updateDisplay(url, '');
-                    
-                    // Set up interval to check for title changes
-                    const titleCheckInterval = setInterval(() => {
-                        const pageTitle = getPageTitle();
-                        updateDisplay(url, pageTitle);
-                    }, 1000);
-                    
-                    // Store interval ID on the iframe element
-                    if (proxyFrame.titleCheckInterval) {
-                        clearInterval(proxyFrame.titleCheckInterval);
+                // Clear URL bar when iframe is interacted with
+                this.proxyFrame.addEventListener('mouseover', () => {
+                    if (!this.navigationInProgress) {
+                        this.urlBar.value = '';
                     }
-                    proxyFrame.titleCheckInterval = titleCheckInterval;
+                });
+
+                // Navigation and window events
+                const backButton = document.querySelector('.nav-back');
+                backButton.addEventListener('click', () => window.history.back());
+                window.addEventListener('message', this.handleMessage.bind(this));
+                window.addEventListener('popstate', this.handlePopState.bind(this));
+                window.addEventListener('unhandledrejection', this.handleUnhandledRejection.bind(this));
+                window.addEventListener('load', this.handleInitialLoad.bind(this));
+
+                // URL validation events
+                this.urlBar.addEventListener('input', () => {
+                    this.clearError();
+                    this.validateUrlFormat(this.urlBar.value);
+                });
+            }
+
+            async handleUrlBarKeydown(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const input = this.urlBar.value.trim();
+                    if (!input) return;
+
+                    try {
+                        const url = this.formatUrl(input);
+                        await this.navigateToUrl(url);
+                    } catch (err) {
+                        this.showError(err.message);
+                    }
                 }
-            } catch (err) {
-                console.error('Error updating display:', err);
             }
-        });
 
-        // Add error event listener for iframe
-        proxyFrame.addEventListener('error', (e) => {
-            showError('Failed to load content');
-        });
+            formatUrl(input) {
+                // Handle special URLs
+                if (input.startsWith('about:') || input.startsWith('chrome:') || 
+                    input.startsWith('edge:') || input.startsWith('firefox:')) {
+                    throw new Error('Browser-specific URLs are not supported');
+                }
 
-        // Cleanup on page unload
-        window.addEventListener('unload', () => {
-            if (proxyFrame.titleCheckInterval) {
-                clearInterval(proxyFrame.titleCheckInterval);
+                // Handle search queries
+                if (!input.includes('.') || input.includes(' ')) {
+                    return `https://www.duckduckgo.com/search?q=${encodeURIComponent(input)}`;
+                }
+
+                // Add protocol if missing
+                if (!input.match(/^[a-zA-Z]+:\/\//)) {
+                    input = input.startsWith('//') ? `https:${input}` : `https://${input}`;
+                }
+
+                // Validate URL
+                try {
+                    return new URL(input).href;
+                } catch {
+                    throw new Error('Invalid URL format');
+                }
             }
-        });
 
-        // Initialize the proxy frame
-        window.onload = async function() {
-            const params = new URLSearchParams(window.location.search);
-            const url = params.get('url');
-            
-            if (url) {
+            validateUrlFormat(input) {
+                if (!input) return;
+                
+                try {
+                    this.formatUrl(input);
+                    this.urlBar.classList.remove('invalid');
+                } catch {
+                    this.urlBar.classList.add('invalid');
+                }
+            }
+
+            async navigateToUrl(url, pushHistory = true) {
+                if (this.navigationInProgress) return;
+                this.navigationInProgress = true;
+
                 try {
                     await registerSW();
                     const encodedUrl = __uv$config.prefix + __uv$config.encodeUrl(url);
-                    proxyFrame.src = encodedUrl;
-                    updateDisplay(url, '');
-
-                    // Add error handler for CORS issues
-                    window.addEventListener('unhandledrejection', function(event) {
-                        if (event.reason.toString().includes('CORS')) {
-                            showError('CORS Error - Trying to reconnect...');
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 2000);
-                        }
-                    });
-
+                    this.proxyFrame.src = encodedUrl;
+                    
+                    if (url !== this.lastKnownUrl) {
+                        this.updateUrlDisplay(url, pushHistory);
+                    }
+                    this.clearError();
                 } catch (err) {
-                    console.error('Failed to load proxy content:', err);
-                    showError(err.toString());
+                    this.showError(err.message);
+                    console.error('Navigation failed:', err);
+                } finally {
+                    this.navigationInProgress = false;
                 }
-            } else {
-                showError('No URL provided');
             }
-        };
+
+            updateUrlDisplay(url, pushHistory = true) {
+                if (url === this.lastKnownUrl) return;
+                
+                this.lastKnownUrl = url;
+                this.urlBar.value = url;
+                
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('url', url);
+                
+                if (pushHistory) {
+                    window.history.pushState({ url }, '', newUrl);
+                } else {
+                    window.history.replaceState({ url }, '', newUrl);
+                }
+            }
+
+            showError(message) {
+                this.urlBar.classList.add('error');
+                this.errorTooltip.textContent = message;
+                setTimeout(() => this.clearError(), 3000);
+            }
+
+            clearError() {
+                this.urlBar.classList.remove('error');
+                this.errorTooltip.textContent = '';
+            }
+
+            handleFrameLoad() {
+                this.clearError();
+                
+                if (this.proxyFrame.src && !this.proxyFrame.src.startsWith('about:')) {
+                    const decodedUrl = this.decodeProxyUrl(this.proxyFrame.src);
+                    if (decodedUrl) {
+                        this.updateUrlDisplay(decodedUrl, false);
+                    }
+                }
+
+                // Try to update page title
+                try {
+                    const pageTitle = this.proxyFrame.contentDocument?.title;
+                    if (pageTitle) {
+                        document.title = `${pageTitle} - 1346.lol`;
+                    }
+                } catch {}
+            }
+
+            decodeProxyUrl(encodedUrl) {
+                try {
+                    if (!encodedUrl || typeof encodedUrl !== 'string') return '';
+                    const match = encodedUrl.match(/(?:https?:\/\/)?[^@]+@(.+)$/);
+                    return match ? match[1] : '';
+                } catch (err) {
+                    console.error('Error decoding URL:', err);
+                    return '';
+                }
+            }
+
+            handleMessage(event) {
+                if (event.data?.type === 'uv_update' && typeof event.data.url === 'string') {
+                    this.updateUrlDisplay(event.data.url, true);
+                }
+            }
+
+            handlePopState(event) {
+                const params = new URLSearchParams(window.location.search);
+                const url = params.get('url');
+                
+                if (url) {
+                    this.navigateToUrl(url, false);
+                }
+            }
+
+            handleUnhandledRejection(event) {
+                if (event.reason.toString().includes('CORS')) {
+                    this.showError('CORS Error - Reconnecting...');
+                    setTimeout(() => window.location.reload(), 2000);
+                }
+            }
+
+            async handleInitialLoad() {
+                const params = new URLSearchParams(window.location.search);
+                const url = params.get('url');
+                
+                if (url) {
+                    this.urlBar.value = url;
+                    await this.navigateToUrl(url, false);
+                }
+            }
+
+            handleReload() {
+                const currentUrl = new URLSearchParams(window.location.search).get('url');
+                if (currentUrl) {
+                    this.navigateToUrl(currentUrl, false);
+                }
+            }
+        }
+
+        // Initialize URL manager
+        const urlManager = new URLManager();
     </script>
 </body>
 </html>
