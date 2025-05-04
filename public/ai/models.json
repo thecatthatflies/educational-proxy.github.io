@@ -1,0 +1,26 @@
+[
+  {
+    "value": "gemma2-9b-it",
+    "displayName": "Gemma2 9B IT"
+  },
+  {
+    "value": "llama-3.3-70b-versatile",
+    "displayName": "Llama 3.3 70B Versatile"
+  },
+  {
+    "value": "llama-3.1-8b-instant",
+    "displayName": "Llama 3.1 8B Instant"
+  },
+  {
+    "value": "mixtral-8x7b",
+    "displayName": "Mixtral 8x7B 32768"
+  },
+  {
+    "value": "qwen-2.5-32b",
+    "displayName": "Qwen 2.5 32b"
+  },
+  {
+    "value": "deepseek-r1-distill-llama-70b",
+    "displayName": "Deepseek R1 Distill Llama 70B"
+  }
+]

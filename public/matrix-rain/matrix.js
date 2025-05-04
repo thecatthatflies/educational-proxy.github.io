@@ -75,16 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
   container.style.opacity = '0';
   document.body.appendChild(container);
   
-  // Check if loader has been shown before
-  const loaderShown = localStorage.getItem('loaderShown');
-  
-  // Start matrix rain immediately if loader has been shown
-  const delay = loaderShown ? 0 : 5500;
-  
-  setTimeout(() => {
-    new MatrixRain(container);
-    // Fade in the matrix background
-    container.style.transition = 'opacity 1s ease';
-    container.style.opacity = '1';
-  }, delay);
+  // No need to check for loader on subpages, start immediately.
+  // const loaderShown = localStorage.getItem('loaderShown');
+  // const delay = loaderShown ? 0 : 5500; // Removed delay logic
+
+  // Initialize immediately
+  new MatrixRain(container);
+  // Fade in the matrix background
+  container.style.transition = 'opacity 0.5s ease'; // Faster fade-in
+  container.style.opacity = '1';
 });

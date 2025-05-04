@@ -175,12 +175,10 @@ body:not(.index) .loader {
     to { opacity: 0; }
 }
 
-/* Remove all global body pseudo-elements */
 body::before, body::after {
     content: none;
 }
 
-/* Only apply animations to index page */
 body.index::before {
     content: '';
     position: fixed;
@@ -453,6 +451,18 @@ button:active {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+/* Specific button sizing */
+.button-container button:nth-child(1),
+.button-container button:nth-child(4) {
+    flex: 1 1 100%; /* Allow grow/shrink, full width basis */
+}
+
+.button-container button:nth-child(2),
+.button-container button:nth-child(3) {
+    flex: 1 1 calc(50% - 0.5rem); /* Allow grow/shrink, half width basis adjusted for 1rem gap */
+    min-width: 150px; /* Prevent buttons from becoming too small */
+}
 }
 
 /* Fast Button Class */
@@ -545,7 +555,6 @@ a:hover::after {
         padding: 1rem;
     }
 
-    /* Reduce animation intensity for better mobile performance */
     @media (prefers-reduced-motion: no-preference) {
         body::after {
             animation: scanline 12s linear infinite;
@@ -562,7 +571,6 @@ a:hover::after {
     }
 }
 
-/* Respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation: none !important;
@@ -572,19 +580,19 @@ a:hover::after {
 
 .info-text {
     font-size: 0.8em;
-    color: #00aa00;  /* Brighter green to match site theme */
+    color: #00aa00;  
     text-align: center;
     margin-top: 2em;
-    margin-bottom: 2em;  /* Add bottom margin */
+    margin-bottom: 2em; 
     cursor: help;
-    position: relative;  /* Ensure positioning context */
+    position: relative;  
 }
 
 .info-text .tooltip {
     position: relative;
     display: inline-block;
     margin-left: 5px;
-    color: #00ff00;  /* Brighter color for the question mark */
+    color: #00ff00; 
     border: 1px solid #004400;
     padding: 0 6px;
     border-radius: 50%;
@@ -595,24 +603,24 @@ a:hover::after {
 .info-text .tooltip .tooltip-text {
     visibility: hidden;
     width: 300px;
-    background-color: rgba(0, 20, 0, 0.95);  /* Match site theme */
-    color: #00ff00;  /* Match site theme */
+    background-color: rgba(0, 20, 0, 0.95);  
+    color: #00ff00;  
     text-align: center;
     border-radius: 6px;
     padding: 12px;
     position: absolute;
-    z-index: 1000;  /* Ensure it's above other elements */
+    z-index: 1000;  
     bottom: 150%;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    border: 1px solid #004400;  /* Match site theme */
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);  /* Add glow effect */
+    border: 1px solid #004400;  
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.1); 
 }
 
 .info-text .tooltip:hover {
-    border-color: #00ff00;  /* Highlight on hover */
+    border-color: #00ff00;  
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
     transform: scale(1.1);
     background: rgba(0, 40, 0, 0.95);
@@ -626,7 +634,6 @@ a:hover::after {
     border-color: #00ff00;
 }
 
-/* Add a subtle animation for the tooltip text */
 .info-text .tooltip .tooltip-text::after {
     content: '';
     position: absolute;

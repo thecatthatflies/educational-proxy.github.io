@@ -36,7 +36,8 @@ async function loadGames() {
             { path: 'run3', title: 'Run 3' },
             { path: 'amongus', title: 'Among Us' },
             { path: 'motox3mwinter', title: 'Moto X3M Winter' },
-            { path: 'supermariobros', title: 'Super Mario Bros' }
+            { path: 'supermariobros', title: 'Super Mario Bros' },
+            { path: 'idle-breakout', title: 'Idle Breakout' }
         ];
 
         // Clear existing buttons

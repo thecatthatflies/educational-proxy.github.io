@@ -1,45 +1,29 @@
-# 1346.lol
+# 1346.lol - Gaming Platform & Web Proxy
 
-A sleek, terminal-styled web proxy powered by uv static, featuring a minimalist interface with a retro-computing aesthetic.
+A feature-rich gaming platform and web proxy service powered by Ultraviolet Static, offering a unique blend of classic and modern browser games alongside secure web browsing capabilities.
 
-## Overview
+## 🎮 Featured Games
 
-This is a completely static site that can be deployed to any static hosting platform. The entire application runs client-side, making it extremely portable and easy to deploy.
+Our extensive library includes popular titles like:
+- 1v1.LOL
+- 2048
+- Among Us
+- Awesome Tanks 2
+- BitLife
+- Cookie Clicker
+- Crossy Road
+- Duck Life series
+- Doodle Jump
+- Flappy Bird
+- Fruit Ninja
+- Learn to Fly
+- Slope
+- Super Mario Bros
+- Wordle
+- Many more!
 
-## Deployment
+This is a fully static site and can be easily deployed on any static hosting service.
 
-You can deploy this site to any static hosting platform, including:
+## ⚖️ License
 
-- Netlify
-- GitHub Pages
-- Vercel
-- Cloudflare Pages
-- Amazon S3
-- Any basic web server
-
-## Features
-
-- Terminal-styled interface
-- Retro-computing aesthetic
-- UV proxy integration
-- Client-side only (no server required)
-- Responsive design
-- Easy deployment
-
-## Local Development
-
-1. Clone the repository
-2. Navigate to the project directory
-3. Serve the files using any static file server
-
-For example, using Python's built-in server:
-```bash
-python -m http.server 8000
-```
-
-Or using Node's `http-server`:
-```bash
-npx http-server
-```
-
-Then open your browser to `localhost:8000` (or whatever port your server uses).
+All credit to TIW uv-static for the proxy.
